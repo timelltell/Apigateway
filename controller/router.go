@@ -36,12 +36,17 @@ func GetConfigFromYml() ConfigMap{
 	return tmp
 }
 func GetRouter() *gin.Engine{
+	//初始化配置信息
 	conf:=GetProxy()
+	//加载全局中间件
 	engine:=gin.New()
 	engine.Use(gin.Recovery())
 	engine.Use(middle.Request())
-
-	//
+	//注册路由中间件
+	for alias:=range conf{
+		relative:="/"+alias+"/*uri"
+		engine.Any(relative,middle.)
+	}
 }
 func GetProxy() (conf1 ConfigMap){
 	conf:=GetConfigFromYml()
