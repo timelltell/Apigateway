@@ -19,8 +19,8 @@ type Config struct {
 	Alias string `json:"alias"`
 	AppCode string `json:"app_code"`
 	JwtKey string `json:"jwt_key"`
-	Timeout string `json:"timeout"`
-	Url string `json:"url"`
+	Timeout int64 `json:"timeout"`
+	Url []string `json:"url"`
 }
 type backendMap struct{
 	domain string
@@ -30,17 +30,23 @@ type ConfigMap map[string]Config
 type proxyMap map[string][]backendMap
 var ProxyMapDetail proxyMap
 func GetConfigFromYml() ConfigMap{
-	var tmp map[string]Config
-	tmp = make( map[string]Config)
+	var tmp ConfigMap
+	tmp = make( ConfigMap )
 	return tmp
 }
-func GetRouters() *gin.Engine{
+func GetRouter() *gin.Engine{
+	conf:=GetProxy()
+	engine:=gin.New()
+	engine.Use(gin.Recovery())
+	engine.Use(middl)
+}
+func GetProxy() (conf1 ConfigMap){
 	conf:=GetConfigFromYml()
 	if len(conf) ==0{
 		panic("no proxy config")
 	}
 	ProxyMapDetail = make(proxyMap)
-	for _,config :=range conf{
+	for ali,config :=range conf{
 		timeout:=config.Timeout
 		urlSlice:=config.Url
 		for _,singleUrl :=range urlSlice{
@@ -50,10 +56,12 @@ func GetRouters() *gin.Engine{
 					domain: urlInfo.Host,
 					proxy: newRVP(urlInfo,timeout),
 				}
+				ProxyMapDetail[ali]=append(ProxyMapDetail[ali],*info)
 			}
 		}
 
 	}
+	return
 
 }
 func newRVP(target *url.URL,timeout int64) *httputil.ReverseProxy{
