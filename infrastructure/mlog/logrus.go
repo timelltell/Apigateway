@@ -4,8 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	lfshook2 "github.com/rifflock/lfshook"
+	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	"path"
+	"strconv"
 	"time"
 )
 
@@ -52,10 +54,28 @@ func ConfigLocalFilesystemLogger(logpath,loglevel string){
 	},&logrus.JSONFormatter{})
 	logClient.AddHook(lfshook)
 }
-
+//每次进入网关，打印日志
 func AccessBegin(c *gin.Context){
 	logClient.WithFields(logrus.Fields{
 		"type":"xxx",
 		"host":c.Request.URL.Host,
 	}).Info("xxx")
+}
+//每次退出网关，打印日志
+func AccessEnd(c *gin.Context,time int){
+	logClient.WithFields(logrus.Fields{
+		"type":"xxx",
+		"host":c.Request.URL.Host,
+		"cost":strconv.Itoa(time),
+	}).Info("xxx")
+}
+
+func GetUniId(c *gin.Context)(uid string){
+	id,exits:=c.Get("requestid")
+	if !exits{
+		uid=uuid.NewV4().String()
+	}else {
+		uid=id.(string)
+	}
+	return uid
 }

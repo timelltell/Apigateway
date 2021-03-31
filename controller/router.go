@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"context"
+	"myproject/Apigateway/controller/middle"
 	"strings"
 	"github.com/gin-gonic/gin"
 	"net"
@@ -38,7 +39,9 @@ func GetRouter() *gin.Engine{
 	conf:=GetProxy()
 	engine:=gin.New()
 	engine.Use(gin.Recovery())
-	engine.Use(middl)
+	engine.Use(middle.Request())
+
+	//
 }
 func GetProxy() (conf1 ConfigMap){
 	conf:=GetConfigFromYml()
