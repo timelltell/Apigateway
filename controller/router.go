@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"context"
+	"myproject/Apigateway/config"
 	"myproject/Apigateway/controller/middle"
 	"strings"
 	"github.com/gin-gonic/gin"
@@ -16,23 +17,25 @@ import (
 )
 
 var engine *gin.Engine
-type Config struct {
-	Alias string `json:"alias"`
-	AppCode string `json:"app_code"`
-	JwtKey string `json:"jwt_key"`
-	Timeout int64 `json:"timeout"`
-	Url []string `json:"url"`
-}
+//type Config struct {
+//	Alias string `json:"alias"`
+//	AppCode string `json:"app_code"`
+//	JwtKey string `json:"jwt_key"`
+//	Timeout int64 `json:"timeout"`
+//	Url []string `json:"url"`
+//	Cors bool `json:"cors"`
+//}
+
 type backendMap struct{
 	domain string
 	proxy *httputil.ReverseProxy
 }
-type ConfigMap map[string]Config
+//type ConfigMap map[string]Config
 type proxyMap map[string][]backendMap
 var ProxyMapDetail proxyMap
-func GetConfigFromYml() ConfigMap{
-	var tmp ConfigMap
-	tmp = make( ConfigMap )
+func GetConfigFromYml() config.ConfigMap{
+	var tmp config.ConfigMap
+	tmp = make( config.ConfigMap )
 	return tmp
 }
 func GetRouter() *gin.Engine{
@@ -45,10 +48,11 @@ func GetRouter() *gin.Engine{
 	//注册路由中间件
 	for alias:=range conf{
 		relative:="/"+alias+"/*uri"
-		engine.Any(relative,middle.)
+		engine.Any(relative,middle.SetCors(relative,conf))
 	}
+	return engine
 }
-func GetProxy() (conf1 ConfigMap){
+func GetProxy() (conf1 config.ConfigMap){
 	conf:=GetConfigFromYml()
 	if len(conf) ==0{
 		panic("no proxy config")
