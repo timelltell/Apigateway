@@ -26,13 +26,7 @@ var engine *gin.Engine
 //	Cors bool `json:"cors"`
 //}
 
-type backendMap struct{
-	domain string
-	proxy *httputil.ReverseProxy
-}
-//type ConfigMap map[string]Config
-type proxyMap map[string][]backendMap
-var ProxyMapDetail proxyMap
+
 func GetConfigFromYml() config.ConfigMap{
 	var tmp config.ConfigMap
 	tmp = make( config.ConfigMap )
@@ -57,18 +51,18 @@ func GetProxy() (conf1 config.ConfigMap){
 	if len(conf) ==0{
 		panic("no proxy config")
 	}
-	ProxyMapDetail = make(proxyMap)
+	middle.ProxyMapDetail = make(middle.ProxyMap)
 	for ali,config :=range conf{
 		timeout:=config.Timeout
 		urlSlice:=config.Url
 		for _,singleUrl :=range urlSlice{
 			urlInfo,err:=url.Parse(singleUrl)
 			if err == nil{
-				info:=&backendMap{
-					domain: urlInfo.Host,
-					proxy: newRVP(urlInfo,timeout),
+				info:=&middle.BackendMap{
+					Domain: urlInfo.Host,
+					Proxy: newRVP(urlInfo,timeout),
 				}
-				ProxyMapDetail[ali]=append(ProxyMapDetail[ali],*info)
+				middle.ProxyMapDetail[ali]=append(middle.ProxyMapDetail[ali],*info)
 			}
 		}
 

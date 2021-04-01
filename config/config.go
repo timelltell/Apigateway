@@ -7,6 +7,7 @@ type Config struct {
 	Timeout int64 `json:"timeout"`
 	Url []string `json:"url"`
 	Cors bool `json:"cors"`
+	Host string `json:"host"`
 }
 
 
