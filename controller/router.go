@@ -48,7 +48,7 @@ func GetRouter() *gin.Engine{
 	//注册路由中间件
 	for alias:=range conf{
 		relative:="/"+alias+"/*uri"
-		engine.Any(relative,middle.SetCors(relative,conf))
+		engine.Any(relative,middle.SetCors(relative,conf),middle.Login(relative,conf))
 	}
 	return engine
 }

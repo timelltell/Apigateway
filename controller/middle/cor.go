@@ -28,5 +28,6 @@ func SetCors(alias string,conf config.ConfigMap ) gin.HandlerFunc{
 				c.AbortWithStatus(http.StatusNoContent)
 			}
 		}
+		c.Next()
 	}
 }
