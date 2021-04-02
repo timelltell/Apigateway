@@ -8,6 +8,7 @@ type Config struct {
 	Url []string `json:"url"`
 	Cors bool `json:"cors"`
 	Host string `json:"host"`
+	Limit float64 `json:"limit"`
 }
 
 
